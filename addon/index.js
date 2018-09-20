@@ -1,5 +1,6 @@
 import moment from './lib';
 import Ember from 'ember';
+import { Copyable } from 'ember-copy';
 
 
 function hasOwnProp(a, b) {
@@ -45,7 +46,7 @@ function createAugmentedMomentFrom(fn) {
   const augmentedMoment = function() {
     const m = fn(...arguments);
     const meta = Ember.meta(m);
-    meta.addMixin(Ember.Copyable);
+    meta.addMixin(Copyable);
 
     return m;
   }
