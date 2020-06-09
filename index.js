@@ -25,37 +25,19 @@ module.exports = {
     this.importDependencies();
   },
 
-  updateFastBootManifest(manifest) {
-    let target = 'fastboot-moment.js';
-
-    if (this._options.includeTimezone) {
-      target = 'fastboot-moment-timezone.js';
-    }
-
-    manifest.vendorFiles.push('moment/' + target);
-
-    return manifest;
-  },
-
   importDependencies() {
     let options = this._options;
 
     if (options.includeTimezone) {
       this.import(
-        {
-          development: 'vendor/moment-timezone/tz.js',
-          production: 'vendor/moment-timezone/tz.min.js'
-        },
+        'vendor/moment-timezone/tz.js',
         { prepend: true }
       );
     }
 
     if (typeof options.includeLocales === 'boolean' && options.includeLocales) {
       this.import(
-        {
-          development: 'vendor/moment/min/moment-with-locales.js',
-          production: 'vendor/moment/min/moment-with-locales.min.js'
-        },
+        'vendor/moment/moment-with-locales.js',
         { prepend: true }
       );
     } else {
@@ -68,10 +50,7 @@ module.exports = {
       }
 
       this.import(
-        {
-          development: 'vendor/moment/moment.js',
-          production: 'vendor/moment/min/moment.min.js'
-        },
+        'vendor/moment/moment.js',
         { prepend: true }
       );
     }
@@ -121,16 +100,8 @@ module.exports = {
   },
 
   treeForPublic() {
-    let hasFastBoot = this.project.addons.some(
-      addon => addon.name === 'ember-cli-fastboot'
-    );
-    let publicTree = this._super.treeForPublic.apply(this, arguments);
     let options = this._options;
     let trees = [];
-
-    if (publicTree && hasFastBoot) {
-      trees.push(publicTree);
-    }
 
     if (options.localeOutputPath) {
       trees.push(
@@ -179,12 +150,10 @@ module.exports = {
 
     if (options.includeTimezone) {
       let timezonePath;
-      let timezoneMinPath;
 
       switch (options.includeTimezone) {
         case 'all':
           timezonePath = 'builds/moment-timezone-with-data.js';
-          timezoneMinPath = 'builds/moment-timezone-with-data.min.js';
           break;
         case '2010-2020':
           this.ui.writeLine(
@@ -196,11 +165,9 @@ module.exports = {
         case '2012-2022':
         case '2010-2020':
           timezonePath = 'builds/moment-timezone-with-data-*.js';
-          timezoneMinPath = 'builds/moment-timezone-with-data-*.min.js';
           break;
         case 'none':
           timezonePath = 'moment-timezone.js';
-          timezoneMinPath = 'builds/moment-timezone.min.js';
           break;
         default:
           throw new Error(
@@ -216,13 +183,6 @@ module.exports = {
         rename(
           funnel(timezoneNode, { include: [timezonePath] }),
           () => 'moment-timezone/tz.js'
-        )
-      );
-
-      trees.push(
-        rename(
-          funnel(timezoneNode, { include: [timezoneMinPath] }),
-          () => 'moment-timezone/tz.min.js'
         )
       );
     }
